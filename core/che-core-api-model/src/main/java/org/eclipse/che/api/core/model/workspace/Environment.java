@@ -40,4 +40,6 @@ public interface Environment {
      * to investigate
      */
     List<? extends MachineConfig> getMachineConfigs();
+
+    String getType();
 }

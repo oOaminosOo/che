@@ -33,6 +33,7 @@ public class EnvironmentImpl implements Environment {
     private String                  name;
     private RecipeImpl              recipe;
     private List<MachineConfigImpl> machineConfigs;
+    private String                  type;
 
     public EnvironmentImpl(String name, Recipe recipe, List<? extends MachineConfig> machineConfigs) {
         this.name = name;
