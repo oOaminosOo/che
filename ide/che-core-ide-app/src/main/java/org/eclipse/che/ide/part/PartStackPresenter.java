@@ -199,7 +199,7 @@ public class PartStackPresenter implements Presenter, PartStackView.ActionDelega
     }
 
     @Nullable
-    protected TabItem getTabByPart(@NotNull PartPresenter part) {
+    public TabItem getTabByPart(@NotNull PartPresenter part) {
         for (Map.Entry<TabItem, PartPresenter> entry : parts.entrySet()) {
 
             if (part.equals(entry.getValue())) {

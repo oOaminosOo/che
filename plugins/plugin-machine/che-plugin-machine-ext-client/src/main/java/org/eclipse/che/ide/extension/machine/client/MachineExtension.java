@@ -96,8 +96,8 @@ public class MachineExtension {
                 machinePortProvider.get();
                 /* Do not show terminal on factories by default */
                 if (appContext.getFactory() == null) {
-                    consolesPanelPresenter.newTerminal();
-                    workspaceAgent.setActivePart(consolesPanelPresenter);
+//                    consolesPanelPresenter.newTerminal();
+//                    workspaceAgent.setActivePart(consolesPanelPresenter);
                 }
             }
 
@@ -121,7 +121,7 @@ public class MachineExtension {
                 perspectiveManager.setPerspectiveId(PROJECT_PERSPECTIVE_ID);
                 workspaceAgent.openPart(consolesPanelPresenter, PartStackType.INFORMATION);
                 if (appContext.getFactory() == null) {
-                     workspaceAgent.setActivePart(consolesPanelPresenter);
+//                     workspaceAgent.setActivePart(consolesPanelPresenter);
                 }
             }
         });

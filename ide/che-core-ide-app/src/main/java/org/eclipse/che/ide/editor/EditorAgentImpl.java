@@ -16,6 +16,7 @@ import com.google.inject.Singleton;
 import com.google.web.bindery.event.shared.EventBus;
 
 import org.eclipse.che.ide.CoreLocalizationConstant;
+import org.eclipse.che.ide.api.constraints.Constraints;
 import org.eclipse.che.ide.api.editor.EditorAgent;
 import org.eclipse.che.ide.api.editor.EditorInput;
 import org.eclipse.che.ide.api.editor.EditorOpenedEvent;
@@ -48,6 +49,7 @@ import java.util.List;
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.eclipse.che.ide.api.parts.PartStackType.EDITING;
+import static org.eclipse.che.ide.api.parts.PartStackType.MULTI_EDITING;
 
 /**
  * Default implementation of {@link EditorAgent}.
@@ -146,7 +148,12 @@ public class EditorAgentImpl implements EditorAgent,
 
     @Override
     public void openEditor(@NotNull final VirtualFile file) {
-        doOpen(file, new OpenEditorCallbackImpl());
+        doOpen(file, new OpenEditorCallbackImpl(), null);
+    }
+
+    @Override
+    public void openEditor(@NotNull VirtualFile file, Constraints constraints) {
+        doOpen(file, null, constraints);
     }
 
     @Override
@@ -158,15 +165,15 @@ public class EditorAgentImpl implements EditorAgent,
 
     @Override
     public void openEditor(@NotNull VirtualFile file, @NotNull OpenEditorCallback callback) {
-        doOpen(file, callback);
+        doOpen(file, callback, null);
     }
 
-    private void doOpen(final VirtualFile file, final OpenEditorCallback callback) {
-        EditorPartPresenter openedEditor = getOpenedEditor(file.getLocation());
-        if (openedEditor != null) {
-            workspaceAgent.setActivePart(openedEditor, EDITING);
-            callback.onEditorActivated(openedEditor);
-        } else {
+    private void doOpen(final VirtualFile file, final OpenEditorCallback callback, Constraints constraints) {
+//        EditorPartPresenter openedEditor = getOpenedEditor(file.getLocation());
+//        if (openedEditor != null) {
+//            workspaceAgent.setActivePart(openedEditor, EDITING);
+//            callback.onEditorActivated(openedEditor);
+//        } else {
             FileType fileType = fileTypeRegistry.getFileTypeByFile(file);
             EditorProvider editorProvider = editorRegistry.getEditor(fileType);
             final EditorPartPresenter editor = editorProvider.getEditor();
@@ -174,7 +181,7 @@ public class EditorAgentImpl implements EditorAgent,
             editor.init(new EditorInputImpl(fileType, file), callback);
             editor.addCloseHandler(this);
 
-            workspaceAgent.openPart(editor, EDITING);
+            workspaceAgent.openPart(editor, MULTI_EDITING, constraints);
             openedEditors.add(editor);
 
             workspaceAgent.setActivePart(editor);
@@ -191,7 +198,7 @@ public class EditorAgentImpl implements EditorAgent,
                     }
                 }
             });
-        }
+//        }
     }
 
     @Override
