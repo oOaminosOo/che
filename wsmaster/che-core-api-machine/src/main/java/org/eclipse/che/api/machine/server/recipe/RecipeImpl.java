@@ -10,29 +10,77 @@
  *******************************************************************************/
 package org.eclipse.che.api.machine.server.recipe;
 
-import org.eclipse.che.api.core.acl.AclEntryImpl;
 import org.eclipse.che.api.core.model.machine.Recipe;
+import org.eclipse.che.api.machine.server.model.impl.AclEntryImpl;
 import org.eclipse.che.api.machine.shared.ManagedRecipe;
 import org.eclipse.che.commons.annotation.Nullable;
 
+import javax.persistence.Basic;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.persistence.UniqueConstraint;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+
+import static javax.persistence.CascadeType.ALL;
 
 /**
  * Implementation of {@link ManagedRecipe}
  *
  * @author Eugene Voevodin
+ * @author Anton Korneta
  */
+@Entity(name = "Recipe")
+@NamedQueries(
+        {
+                @NamedQuery(
+                        name = "Recipe.search",
+                        query = "SELECT DISTINCT rec FROM Recipe rec JOIN rec.acl acl " +
+                                "WHERE ('search' MEMBER OF acl.actions) AND " +
+                                "      (:user IS NULL OR '*' = acl.user OR acl.user = :user) AND " +
+                                "      (:recipeType IS NULL OR rec.type = :recipeType) AND " +
+                                "      (:requiredCount = 0 OR :requiredCount = (SELECT COUNT(tag) " +
+                                "                                               FROM Recipe recipe JOIN recipe.tags tag " +
+                                "                                               WHERE tag IN :tags AND rec.id = recipe.id))"
+                )
+        }
+)
 public class RecipeImpl implements ManagedRecipe {
 
-    private String             id;
-    private String             name;
-    private String             creator;
-    private String             type;
-    private String             script;
-    private List<String>       tags;
-    private String             description;
+    @Id
+    private String id;
+
+    @Basic
+    private String name;
+
+    @Basic
+    private String creator;
+
+    @Basic
+    private String type;
+
+    @Basic
+    private String script;
+
+    @Basic
+    private String description;
+
+    @ElementCollection
+    private List<String> tags;
+
+    @OneToMany(cascade = ALL, orphanRemoval = true)
+    @JoinTable(name = "RECIPE_USER_ACL",
+               uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "recipe_id"}),
+               inverseJoinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user"),
+                                     @JoinColumn(name = "acl_id", referencedColumnName = "id")},
+               joinColumns = @JoinColumn(name = "recipe_id", referencedColumnName = "id"))
     private List<AclEntryImpl> acl;
 
     public RecipeImpl() {
