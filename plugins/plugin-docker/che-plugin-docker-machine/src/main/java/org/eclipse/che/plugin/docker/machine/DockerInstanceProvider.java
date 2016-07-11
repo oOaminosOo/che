@@ -447,6 +447,9 @@ public class DockerInstanceProvider implements InstanceProvider {
                                               .withMemoryLimit(memoryLimit)
                                               .withMemorySwapLimit(memorySwapLimit)
                                               // don't build an image on a node with maintenance
+                                              // Here we obtain key and value of build arg from constraint string.
+                                              // It passed to docker build as environment variable and we should divide constraint condition
+                                              // into two parts. Separator between key(env var name) and value is equal sign.
                                               .addBuildArg(MAINTENANCE_CONSTRAINT.substring(0,MAINTENANCE_CONSTRAINT.lastIndexOf('=')),
                                                            MAINTENANCE_CONSTRAINT.substring(MAINTENANCE_CONSTRAINT.lastIndexOf('=') + 1)),
                               progressMonitor);
@@ -574,12 +577,12 @@ public class DockerInstanceProvider implements InstanceProvider {
                 env = new ArrayList<>(devMachineEnvVariables);
                 env.add(DockerInstanceRuntimeInfo.CHE_WORKSPACE_ID + '=' + machine.getWorkspaceId());
                 env.add(DockerInstanceRuntimeInfo.USER_TOKEN + '=' + getUserToken(machine.getWorkspaceId()));
-                env.add(MAINTENANCE_CONSTRAINT); // do not run new container on a node with maintenance
             } else {
                 portsToExpose = new HashMap<>(commonMachinePortsToExpose);
                 volumes = commonMachineSystemVolumes;
                 env = new ArrayList<>(commonMachineEnvVariables);
             }
+            env.add(MAINTENANCE_CONSTRAINT); // do not run new container on a node with maintenance
 
             final long machineMemory = machine.getConfig().getLimits().getRam() * 1024L * 1024L;
             final long machineMemorySwap = memorySwapMultiplier == -1 ? -1 : (long)(machineMemory * memorySwapMultiplier);
