@@ -26,7 +26,6 @@ import org.eclipse.che.plugin.docker.client.connection.CloseConnectionInputStrea
 import org.eclipse.che.plugin.docker.client.connection.DockerConnection;
 import org.eclipse.che.plugin.docker.client.connection.DockerConnectionFactory;
 import org.eclipse.che.plugin.docker.client.connection.DockerResponse;
-import org.eclipse.che.plugin.docker.client.dto.AuthConfigs;
 import org.eclipse.che.plugin.docker.client.exception.ContainerNotFoundException;
 import org.eclipse.che.plugin.docker.client.exception.DockerException;
 import org.eclipse.che.plugin.docker.client.exception.ImageNotFoundException;
@@ -101,7 +100,6 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -765,14 +763,14 @@ public class DockerConnector {
                                                            .path(apiVersionPathPrefix + "/build")
                                                            .header("X-Registry-Config",
                                                                    authResolver.getXRegistryConfigHeaderValue(params.getAuthConfigs()))) {
-            addQueryParamIfNotNull(connection, "rm", params.isRm());
-            addQueryParamIfNotNull(connection, "forcerm", params.isForceRm());
+            addQueryParamIfNotNull(connection, "rm", params.isRemoveIntermediateContainer());
+            addQueryParamIfNotNull(connection, "forcerm", params.isRemoveIntermediateContainersWithForce());
             addQueryParamIfNotNull(connection, "memory", params.getMemoryLimit());
             addQueryParamIfNotNull(connection, "memswap", params.getMemorySwapLimit());
             addQueryParamIfNotNull(connection, "pull", params.isDoForcePull());
             addQueryParamIfNotNull(connection, "dockerfile", params.getDockerfile());
-            addQueryParamIfNotNull(connection, "nocache", params.isNocache());
-            addQueryParamIfNotNull(connection, "q", params.isQ());
+            addQueryParamIfNotNull(connection, "nocache", params.isNoCache());
+            addQueryParamIfNotNull(connection, "q", params.isQuiet());
             if (params.getTag() == null) {
                 addQueryParamIfNotNull(connection, "t", repository);
             } else {

@@ -31,21 +31,21 @@ import static org.testng.Assert.assertNull;
  */
 public class BuildImageParamsTest {
 
-    private static final String             REPOSITORY        = "repository";
-    private static final String             TAG               = "tag";
-    private static final AuthConfigs        AUTH_CONFIGS      = mock(AuthConfigs.class);
-    private static final Boolean            DO_FORCE_PULL     = true;
-    private static final Long               MEMORY_LIMIT      = 12345L;
-    private static final Long               MEMORY_SWAP_LIMIT = 67890L;
-    private static final File               FILE              = new File(".");
+    private static final String             REPOSITORY                    = "repository";
+    private static final String             TAG                           = "tag";
+    private static final AuthConfigs        AUTH_CONFIGS                  = mock(AuthConfigs.class);
+    private static final Boolean            DO_FORCE_PULL                 = true;
+    private static final Long               MEMORY_LIMIT                  = 12345L;
+    private static final Long               MEMORY_SWAP_LIMIT             = 67890L;
+    private static final File               FILE                          = new File(".");
     private static final List<File>         FILES;
-    private static final String             DOCKERFILE        = "/tmp/Dockerfile";
-    private static final String             REMOTE            = "https://github.com/someuser/remote.git";
-    private static final Boolean            Q                 = false;
-    private static final Boolean            NOCACHE           = false;
-    private static final Boolean            RM                = true;
-    private static final Boolean            FORCE_RM          = true;
-    private static final Map<String,String> BUILD_ARGS        = new HashMap<>();
+    private static final String             DOCKERFILE                    = "/tmp/Dockerfile";
+    private static final String             REMOTE                        = "https://github.com/someuser/remote.git";
+    private static final Boolean            QUIET                         = false;
+    private static final Boolean            NO_CACHE                      = false;
+    private static final Boolean            REMOVE_INTERMEDIATE_CONTAINER = true;
+    private static final Boolean            FORCE_RM                      = true;
+    private static final Map<String,String> BUILD_ARGS                    = new HashMap<>();
 
     static {
         FILES = new ArrayList<>();
@@ -73,10 +73,10 @@ public class BuildImageParamsTest {
         assertNull(buildImageParams.getMemorySwapLimit());
         assertNull(buildImageParams.getDockerfile());
         assertNull(buildImageParams.getRemote());
-        assertNull(buildImageParams.isQ());
-        assertNull(buildImageParams.isNocache());
-        assertNull(buildImageParams.isRm());
-        assertNull(buildImageParams.isForceRm());
+        assertNull(buildImageParams.isQuiet());
+        assertNull(buildImageParams.isNoCache());
+        assertNull(buildImageParams.isRemoveIntermediateContainer());
+        assertNull(buildImageParams.isRemoveIntermediateContainersWithForce());
         assertNull(buildImageParams.getBuildArgs());
     }
 
@@ -94,10 +94,10 @@ public class BuildImageParamsTest {
         assertNull(buildImageParams.getMemorySwapLimit());
         assertNull(buildImageParams.getFiles());
         assertNull(buildImageParams.getDockerfile());
-        assertNull(buildImageParams.isQ());
-        assertNull(buildImageParams.isNocache());
-        assertNull(buildImageParams.isRm());
-        assertNull(buildImageParams.isForceRm());
+        assertNull(buildImageParams.isQuiet());
+        assertNull(buildImageParams.isNoCache());
+        assertNull(buildImageParams.isRemoveIntermediateContainer());
+        assertNull(buildImageParams.isRemoveIntermediateContainersWithForce());
         assertNull(buildImageParams.getBuildArgs());
     }
 
@@ -112,10 +112,10 @@ public class BuildImageParamsTest {
                                            .withMemoryLimit(MEMORY_LIMIT)
                                            .withMemorySwapLimit(MEMORY_SWAP_LIMIT)
                                            .withDockerfile(DOCKERFILE)
-                                           .withQ(Q)
-                                           .withNocache(NOCACHE)
-                                           .withRm(RM)
-                                           .withForceRm(FORCE_RM)
+                                           .withQuiet(QUIET)
+                                           .withNoCache(NO_CACHE)
+                                           .withRemoveIntermediateContainers(REMOVE_INTERMEDIATE_CONTAINER)
+                                           .withRemoveIntermediateContainersWithForce(FORCE_RM)
                                            .withBuildArgs(BUILD_ARGS);
 
         assertNull(buildImageParams.getRemote());
@@ -128,10 +128,10 @@ public class BuildImageParamsTest {
         assertEquals(buildImageParams.getMemoryLimit(), MEMORY_LIMIT);
         assertEquals(buildImageParams.getMemorySwapLimit(), MEMORY_SWAP_LIMIT);
         assertEquals(buildImageParams.getDockerfile(), DOCKERFILE);
-        assertEquals(buildImageParams.isQ(), Q);
-        assertEquals(buildImageParams.isNocache(), NOCACHE);
-        assertEquals(buildImageParams.isRm(), RM);
-        assertEquals(buildImageParams.isForceRm(), FORCE_RM);
+        assertEquals(buildImageParams.isQuiet(), QUIET);
+        assertEquals(buildImageParams.isNoCache(), NO_CACHE);
+        assertEquals(buildImageParams.isRemoveIntermediateContainer(), REMOVE_INTERMEDIATE_CONTAINER);
+        assertEquals(buildImageParams.isRemoveIntermediateContainersWithForce(), FORCE_RM);
         assertEquals(buildImageParams.getBuildArgs(), BUILD_ARGS);
     }
 
@@ -145,10 +145,10 @@ public class BuildImageParamsTest {
                                            .withMemoryLimit(MEMORY_LIMIT)
                                            .withMemorySwapLimit(MEMORY_SWAP_LIMIT)
                                            .withDockerfile(DOCKERFILE)
-                                           .withQ(Q)
-                                           .withNocache(NOCACHE)
-                                           .withRm(RM)
-                                           .withForceRm(FORCE_RM)
+                                           .withQuiet(QUIET)
+                                           .withNoCache(NO_CACHE)
+                                           .withRemoveIntermediateContainers(REMOVE_INTERMEDIATE_CONTAINER)
+                                           .withRemoveIntermediateContainersWithForce(FORCE_RM)
                                            .withBuildArgs(BUILD_ARGS);
 
         assertNull(buildImageParams.getFiles());
@@ -161,10 +161,10 @@ public class BuildImageParamsTest {
         assertEquals(buildImageParams.getMemoryLimit(), MEMORY_LIMIT);
         assertEquals(buildImageParams.getMemorySwapLimit(), MEMORY_SWAP_LIMIT);
         assertEquals(buildImageParams.getDockerfile(), DOCKERFILE);
-        assertEquals(buildImageParams.isQ(), Q);
-        assertEquals(buildImageParams.isNocache(), NOCACHE);
-        assertEquals(buildImageParams.isRm(), RM);
-        assertEquals(buildImageParams.isForceRm(), FORCE_RM);
+        assertEquals(buildImageParams.isQuiet(), QUIET);
+        assertEquals(buildImageParams.isNoCache(), NO_CACHE);
+        assertEquals(buildImageParams.isRemoveIntermediateContainer(), REMOVE_INTERMEDIATE_CONTAINER);
+        assertEquals(buildImageParams.isRemoveIntermediateContainersWithForce(), FORCE_RM);
         assertEquals(buildImageParams.getBuildArgs(), BUILD_ARGS);
     }
 
@@ -217,10 +217,10 @@ public class BuildImageParamsTest {
                         .withMemoryLimit(MEMORY_LIMIT)
                         .withMemorySwapLimit(MEMORY_SWAP_LIMIT)
                         .withDockerfile(DOCKERFILE)
-                        .withQ(Q)
-                        .withNocache(NOCACHE)
-                        .withRm(RM)
-                        .withForceRm(FORCE_RM)
+                        .withQuiet(QUIET)
+                        .withNoCache(NO_CACHE)
+                        .withRemoveIntermediateContainers(REMOVE_INTERMEDIATE_CONTAINER)
+                        .withRemoveIntermediateContainersWithForce(FORCE_RM)
                         .withBuildArgs(BUILD_ARGS);
 
         assertNull(buildImageParams.getRepository());
@@ -234,10 +234,10 @@ public class BuildImageParamsTest {
                         .withMemoryLimit(MEMORY_LIMIT)
                         .withMemorySwapLimit(MEMORY_SWAP_LIMIT)
                         .withDockerfile(DOCKERFILE)
-                        .withQ(Q)
-                        .withNocache(NOCACHE)
-                        .withRm(RM)
-                        .withForceRm(FORCE_RM)
+                        .withQuiet(QUIET)
+                        .withNoCache(NO_CACHE)
+                        .withRemoveIntermediateContainers(REMOVE_INTERMEDIATE_CONTAINER)
+                        .withRemoveIntermediateContainersWithForce(FORCE_RM)
                         .withBuildArgs(BUILD_ARGS);
 
         assertNull(buildImageParams.getTag());
@@ -251,10 +251,10 @@ public class BuildImageParamsTest {
                         .withMemoryLimit(MEMORY_LIMIT)
                         .withMemorySwapLimit(MEMORY_SWAP_LIMIT)
                         .withDockerfile(DOCKERFILE)
-                        .withQ(Q)
-                        .withNocache(NOCACHE)
-                        .withRm(RM)
-                        .withForceRm(FORCE_RM)
+                        .withQuiet(QUIET)
+                        .withNoCache(NO_CACHE)
+                        .withRemoveIntermediateContainers(REMOVE_INTERMEDIATE_CONTAINER)
+                        .withRemoveIntermediateContainersWithForce(FORCE_RM)
                         .withBuildArgs(BUILD_ARGS);
 
         assertNull(buildImageParams.getAuthConfigs());
@@ -268,10 +268,10 @@ public class BuildImageParamsTest {
                         .withMemoryLimit(MEMORY_LIMIT)
                         .withMemorySwapLimit(MEMORY_SWAP_LIMIT)
                         .withDockerfile(DOCKERFILE)
-                        .withQ(Q)
-                        .withNocache(NOCACHE)
-                        .withRm(RM)
-                        .withForceRm(FORCE_RM)
+                        .withQuiet(QUIET)
+                        .withNoCache(NO_CACHE)
+                        .withRemoveIntermediateContainers(REMOVE_INTERMEDIATE_CONTAINER)
+                        .withRemoveIntermediateContainersWithForce(FORCE_RM)
                         .withBuildArgs(BUILD_ARGS);
 
         assertNull(buildImageParams.isDoForcePull());
@@ -285,10 +285,10 @@ public class BuildImageParamsTest {
                         .withDoForcePull(DO_FORCE_PULL)
                         .withMemorySwapLimit(MEMORY_SWAP_LIMIT)
                         .withDockerfile(DOCKERFILE)
-                        .withQ(Q)
-                        .withNocache(NOCACHE)
-                        .withRm(RM)
-                        .withForceRm(FORCE_RM)
+                        .withQuiet(QUIET)
+                        .withNoCache(NO_CACHE)
+                        .withRemoveIntermediateContainers(REMOVE_INTERMEDIATE_CONTAINER)
+                        .withRemoveIntermediateContainersWithForce(FORCE_RM)
                         .withBuildArgs(BUILD_ARGS);
 
         assertNull(buildImageParams.getMemoryLimit());
@@ -302,10 +302,10 @@ public class BuildImageParamsTest {
                         .withDoForcePull(DO_FORCE_PULL)
                         .withMemoryLimit(MEMORY_LIMIT)
                         .withDockerfile(DOCKERFILE)
-                        .withQ(Q)
-                        .withNocache(NOCACHE)
-                        .withRm(RM)
-                        .withForceRm(FORCE_RM)
+                        .withQuiet(QUIET)
+                        .withNoCache(NO_CACHE)
+                        .withRemoveIntermediateContainers(REMOVE_INTERMEDIATE_CONTAINER)
+                        .withRemoveIntermediateContainersWithForce(FORCE_RM)
                         .withBuildArgs(BUILD_ARGS);
 
         assertNull(buildImageParams.getMemorySwapLimit());
@@ -319,10 +319,10 @@ public class BuildImageParamsTest {
                         .withDoForcePull(DO_FORCE_PULL)
                         .withMemoryLimit(MEMORY_LIMIT)
                         .withMemorySwapLimit(MEMORY_SWAP_LIMIT)
-                        .withQ(Q)
-                        .withNocache(NOCACHE)
-                        .withRm(RM)
-                        .withForceRm(FORCE_RM)
+                        .withQuiet(QUIET)
+                        .withNoCache(NO_CACHE)
+                        .withRemoveIntermediateContainers(REMOVE_INTERMEDIATE_CONTAINER)
+                        .withRemoveIntermediateContainersWithForce(FORCE_RM)
                         .withBuildArgs(BUILD_ARGS);
 
         assertNull(buildImageParams.getDockerfile());
@@ -337,12 +337,12 @@ public class BuildImageParamsTest {
                         .withMemoryLimit(MEMORY_LIMIT)
                         .withMemorySwapLimit(MEMORY_SWAP_LIMIT)
                         .withDockerfile(DOCKERFILE)
-                        .withNocache(NOCACHE)
-                        .withRm(RM)
-                        .withForceRm(FORCE_RM)
+                        .withNoCache(NO_CACHE)
+                        .withRemoveIntermediateContainers(REMOVE_INTERMEDIATE_CONTAINER)
+                        .withRemoveIntermediateContainersWithForce(FORCE_RM)
                         .withBuildArgs(BUILD_ARGS);
 
-        assertNull(buildImageParams.isQ());
+        assertNull(buildImageParams.isQuiet());
     }
 
     @Test
@@ -354,12 +354,12 @@ public class BuildImageParamsTest {
                         .withMemoryLimit(MEMORY_LIMIT)
                         .withMemorySwapLimit(MEMORY_SWAP_LIMIT)
                         .withDockerfile(DOCKERFILE)
-                        .withQ(Q)
-                        .withRm(RM)
-                        .withForceRm(FORCE_RM)
+                        .withQuiet(QUIET)
+                        .withRemoveIntermediateContainers(REMOVE_INTERMEDIATE_CONTAINER)
+                        .withRemoveIntermediateContainersWithForce(FORCE_RM)
                         .withBuildArgs(BUILD_ARGS);
 
-        assertNull(buildImageParams.isNocache());
+        assertNull(buildImageParams.isNoCache());
     }
 
     @Test
@@ -371,12 +371,12 @@ public class BuildImageParamsTest {
                         .withMemoryLimit(MEMORY_LIMIT)
                         .withMemorySwapLimit(MEMORY_SWAP_LIMIT)
                         .withDockerfile(DOCKERFILE)
-                        .withQ(Q)
-                        .withNocache(NOCACHE)
-                        .withForceRm(FORCE_RM)
+                        .withQuiet(QUIET)
+                        .withNoCache(NO_CACHE)
+                        .withRemoveIntermediateContainersWithForce(FORCE_RM)
                         .withBuildArgs(BUILD_ARGS);
 
-        assertNull(buildImageParams.isRm());
+        assertNull(buildImageParams.isRemoveIntermediateContainer());
     }
 
     @Test
@@ -388,12 +388,12 @@ public class BuildImageParamsTest {
                         .withMemoryLimit(MEMORY_LIMIT)
                         .withMemorySwapLimit(MEMORY_SWAP_LIMIT)
                         .withDockerfile(DOCKERFILE)
-                        .withQ(Q)
-                        .withNocache(NOCACHE)
-                        .withRm(RM)
+                        .withQuiet(QUIET)
+                        .withNoCache(NO_CACHE)
+                        .withRemoveIntermediateContainers(REMOVE_INTERMEDIATE_CONTAINER)
                         .withBuildArgs(BUILD_ARGS);
 
-        assertNull(buildImageParams.isForceRm());
+        assertNull(buildImageParams.isRemoveIntermediateContainersWithForce());
     }
 
     @Test
@@ -405,10 +405,10 @@ public class BuildImageParamsTest {
                         .withMemoryLimit(MEMORY_LIMIT)
                         .withMemorySwapLimit(MEMORY_SWAP_LIMIT)
                         .withDockerfile(DOCKERFILE)
-                        .withQ(Q)
-                        .withNocache(NOCACHE)
-                        .withRm(RM)
-                        .withForceRm(FORCE_RM);
+                        .withQuiet(QUIET)
+                        .withNoCache(NO_CACHE)
+                        .withRemoveIntermediateContainers(REMOVE_INTERMEDIATE_CONTAINER)
+                        .withRemoveIntermediateContainersWithForce(FORCE_RM);
 
         assertNull(buildImageParams.getBuildArgs());
     }

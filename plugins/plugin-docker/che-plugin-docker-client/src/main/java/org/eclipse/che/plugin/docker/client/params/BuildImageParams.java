@@ -41,10 +41,10 @@ public class BuildImageParams {
     private List<File>         files;
     private String             dockerfile;
     private String             remote;
-    private Boolean            q;
-    private Boolean            nocache;
-    private Boolean            rm;
-    private Boolean            forceRm;
+    private Boolean            quiet;
+    private Boolean            noCache;
+    private Boolean            removeIntermediateContainer;
+    private Boolean            removeIntermediateContainersWithForce;
     private Map<String,String> buildArgs;
 
     /**
@@ -225,53 +225,53 @@ public class BuildImageParams {
     /**
      * Suppress verbose build output.
      *
-     * @param q
+     * @param quiet
      *         quiet flag
      * @return this params instance
      */
-    public BuildImageParams withQ(boolean q) {
-        this.q = q;
+    public BuildImageParams withQuiet(boolean quiet) {
+        this.quiet = quiet;
         return this;
     }
 
     /**
      * Do not use the cache when building the image.
      *
-     * @param nocache
-     *         nocache flag
+     * @param noCache
+     *         no cache flag
      * @return this params instance
      */
-    public BuildImageParams withNocache(boolean nocache) {
-        this.nocache = nocache;
+    public BuildImageParams withNoCache(boolean noCache) {
+        this.noCache = noCache;
         return this;
     }
 
     /**
      * Remove intermediate containers after a successful build.
      *
-     * @param rm
-     *         rm flag
+     * @param removeIntermediateContainer
+     *         remove intermediate container flag
      * @return this params instance
      */
-    public BuildImageParams withRm(boolean rm) {
-        this.rm = rm;
+    public BuildImageParams withRemoveIntermediateContainers(boolean removeIntermediateContainer) {
+        this.removeIntermediateContainer = removeIntermediateContainer;
         return this;
     }
 
     /**
-     * Always remove intermediate containers (includes rm).
+     * Always remove intermediate containers (includes removeIntermediateContainer).
      *
-     * @param forceRm
-     *         forceRm flag
+     * @param removeIntermediateContainersWithForce
+     *         remove intermediate containers with force flag
      * @return this params instance
      */
-    public BuildImageParams withForceRm(boolean forceRm) {
-        this.forceRm = forceRm;
+    public BuildImageParams withRemoveIntermediateContainersWithForce(boolean removeIntermediateContainersWithForce) {
+        this.removeIntermediateContainersWithForce = removeIntermediateContainersWithForce;
         return this;
     }
 
     /**
-     * JSON map of string pairs for build-time variables.
+     * Map of string pairs for build-time variables.
      * Users pass these values at build-time.
      * Docker uses the buildargs as the environment context for command(s) run via the Dockerfile’s RUN instruction
      * or for variable expansion in other Dockerfile instructions.
@@ -351,20 +351,20 @@ public class BuildImageParams {
         return remote;
     }
 
-    public Boolean isQ() {
-        return q;
+    public Boolean isQuiet() {
+        return quiet;
     }
 
-    public Boolean isNocache() {
-        return nocache;
+    public Boolean isNoCache() {
+        return noCache;
     }
 
-    public Boolean isRm() {
-        return rm;
+    public Boolean isRemoveIntermediateContainer() {
+        return removeIntermediateContainer;
     }
 
-    public Boolean isForceRm() {
-        return forceRm;
+    public Boolean isRemoveIntermediateContainersWithForce() {
+        return removeIntermediateContainersWithForce;
     }
 
     public Map<String,String> getBuildArgs() {
@@ -385,17 +385,17 @@ public class BuildImageParams {
                Objects.equals(files, that.files) &&
                Objects.equals(dockerfile, that.dockerfile) &&
                Objects.equals(remote, that.remote) &&
-               Objects.equals(q, that.q) &&
-               Objects.equals(nocache, that.nocache) &&
-               Objects.equals(rm, that.rm) &&
-               Objects.equals(forceRm, that.forceRm) &&
+               Objects.equals(quiet, that.quiet) &&
+               Objects.equals(noCache, that.noCache) &&
+               Objects.equals(removeIntermediateContainer, that.removeIntermediateContainer) &&
+               Objects.equals(removeIntermediateContainersWithForce, that.removeIntermediateContainersWithForce) &&
                Objects.equals(buildArgs, that.buildArgs);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(repository, tag, authConfigs, doForcePull, memoryLimit, memorySwapLimit, files, dockerfile, remote, q, nocache,
-                            rm, forceRm, buildArgs);
+        return Objects.hash(repository, tag, authConfigs, doForcePull, memoryLimit, memorySwapLimit, files, dockerfile, remote, quiet,
+                            noCache, removeIntermediateContainer, removeIntermediateContainersWithForce, buildArgs);
     }
 
     @Override
@@ -410,11 +410,11 @@ public class BuildImageParams {
                ", files=" + files +
                ", dockerfile='" + dockerfile + '\'' +
                ", remote='" + remote + '\'' +
-               ", q=" + q +
-               ", nocache=" + nocache +
-               ", rm=" + rm +
-               ", forcerm=" + forceRm +
-               ", buildargs=" + buildArgs +
+               ", quiet=" + quiet +
+               ", noCache=" + noCache +
+               ", removeIntermediateContainer=" + removeIntermediateContainer +
+               ", removeIntermediateContainersWithForce=" + removeIntermediateContainersWithForce +
+               ", buildArgs=" + buildArgs +
                '}';
     }
 

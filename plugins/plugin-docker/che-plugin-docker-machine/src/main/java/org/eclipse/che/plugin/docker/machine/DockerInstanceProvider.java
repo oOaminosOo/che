@@ -439,8 +439,8 @@ public class DockerInstanceProvider implements InstanceProvider {
                 }
             };
             docker.buildImage(BuildImageParams.create(files.toArray(new File[files.size()]))
-                                              .withRm(true)
-                                              .withForceRm(true)
+                                              .withRemoveIntermediateContainers(true)
+                                              .withRemoveIntermediateContainersWithForce(true)
                                               .withRepository(imageName)
                                               .withAuthConfigs(dockerCredentials.getCredentials())
                                               .withDoForcePull(doForcePullOnBuild)
