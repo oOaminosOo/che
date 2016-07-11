@@ -59,6 +59,11 @@ public class RecipeDaoTest {
         for (int i = 0; i < ENTRY_COUNT; i++) {
             recipes.add(createRecipe(i));
         }
+        RecipeImpl recipe = createRecipe(10);
+        ArrayList<AclEntryImpl> arrayList = new ArrayList<>();
+        arrayList.add(new AclEntryImpl("*", ImmutableList.of("search", "read")));
+        recipe.setAcl(arrayList);
+        recipes.add(recipe);
         tckRepository.createAll(recipes);
     }
 
@@ -158,6 +163,18 @@ public class RecipeDaoTest {
     public void shouldFindRecipeByUserTagsAndType() throws Exception {
         final RecipeImpl recipe = recipes.get(0);
         final List<RecipeImpl> result = recipeDao.search(recipe.getAcl().get(0).getUser(),
+                                                         recipe.getTags(),
+                                                         recipe.getType(),
+                                                         0,
+                                                         1);
+
+        assertTrue(result.contains(recipe));
+    }
+
+    @Test(dependsOnMethods = {"shouldFindRecipeByUser", "shouldFindingRecipesByTags", "shouldFindRecipeByType"})
+    public void shouldFindRecipeByUserTagsAndType1() throws Exception {
+        final RecipeImpl recipe = recipes.get(0);
+        final List<RecipeImpl> result = recipeDao.search("*",
                                                          recipe.getTags(),
                                                          recipe.getType(),
                                                          0,

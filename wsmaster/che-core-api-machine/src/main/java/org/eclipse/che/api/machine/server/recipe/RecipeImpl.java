@@ -24,8 +24,11 @@ import javax.persistence.JoinTable;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
+import javax.persistence.PostLoad;
+import javax.persistence.PrePersist;
 import javax.persistence.UniqueConstraint;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Objects;
 
@@ -72,9 +75,6 @@ public class RecipeImpl implements ManagedRecipe {
     @Basic
     private String description;
 
-    @ElementCollection
-    private List<String> tags;
-
     @OneToMany(cascade = ALL, orphanRemoval = true)
     @JoinTable(name = "RECIPE_USER_ACL",
                uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "recipe_id"}),
@@ -82,6 +82,34 @@ public class RecipeImpl implements ManagedRecipe {
                                      @JoinColumn(name = "acl_id", referencedColumnName = "id")},
                joinColumns = @JoinColumn(name = "recipe_id", referencedColumnName = "id"))
     private List<AclEntryImpl> acl;
+
+    @ElementCollection
+    private List<String> tags;
+
+    @ElementCollection
+    private List<String> publicActions;
+
+    @PrePersist
+    private void separateActions() {
+        if (publicActions == null) {
+            publicActions = new ArrayList<>();
+        }
+        final Iterator<AclEntryImpl> aclIterator = acl.iterator();
+        while (aclIterator.hasNext()) {
+            final AclEntryImpl aclEntry = aclIterator.next();
+            if ("*".equals(aclEntry.getUser())) {
+                publicActions.addAll(aclEntry.getActions());
+                aclIterator.remove();
+            }
+        }
+    }
+
+    @PostLoad
+    private void collectActions() {
+        if (publicActions != null && !publicActions.isEmpty()) {
+            acl.add(new AclEntryImpl("*", publicActions));
+        }
+    }
 
     public RecipeImpl() {
     }
