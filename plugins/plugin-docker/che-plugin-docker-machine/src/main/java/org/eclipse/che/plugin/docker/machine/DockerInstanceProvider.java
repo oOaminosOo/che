@@ -110,6 +110,11 @@ public class DockerInstanceProvider implements InstanceProvider {
     public static final String DOCKER_IMAGE_TYPE = "image";
 
     /**
+     * prevent build / start machine on a node with maintenance status
+     */
+    public static final String MAINTENANCE_CONSTRAINT = "constraint:com.codenvy.node-state!=maintenance";
+
+    /**
      * Prefix of image repository, used to identify that the image is a machine saved to snapshot.
      */
     public static final String MACHINE_SNAPSHOT_PREFIX = "machine_snapshot_";
@@ -434,11 +439,16 @@ public class DockerInstanceProvider implements InstanceProvider {
                 }
             };
             docker.buildImage(BuildImageParams.create(files.toArray(new File[files.size()]))
+                                              .withRm(true)
+                                              .withForceRm(true)
                                               .withRepository(imageName)
                                               .withAuthConfigs(dockerCredentials.getCredentials())
                                               .withDoForcePull(doForcePullOnBuild)
                                               .withMemoryLimit(memoryLimit)
-                                              .withMemorySwapLimit(memorySwapLimit),
+                                              .withMemorySwapLimit(memorySwapLimit)
+                                              // don't build an image on a node with maintenance
+                                              .addBuildArg(MAINTENANCE_CONSTRAINT.substring(0,MAINTENANCE_CONSTRAINT.lastIndexOf('=')),
+                                                           MAINTENANCE_CONSTRAINT.substring(MAINTENANCE_CONSTRAINT.lastIndexOf('=') + 1)),
                               progressMonitor);
         } catch (IOException e) {
             throw new MachineException(e.getLocalizedMessage(), e);
@@ -564,6 +574,7 @@ public class DockerInstanceProvider implements InstanceProvider {
                 env = new ArrayList<>(devMachineEnvVariables);
                 env.add(DockerInstanceRuntimeInfo.CHE_WORKSPACE_ID + '=' + machine.getWorkspaceId());
                 env.add(DockerInstanceRuntimeInfo.USER_TOKEN + '=' + getUserToken(machine.getWorkspaceId()));
+                env.add(MAINTENANCE_CONSTRAINT); // do not run new container on a node with maintenance
             } else {
                 portsToExpose = new HashMap<>(commonMachinePortsToExpose);
                 volumes = commonMachineSystemVolumes;

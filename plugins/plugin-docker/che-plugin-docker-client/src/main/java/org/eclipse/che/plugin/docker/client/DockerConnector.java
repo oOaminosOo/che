@@ -101,6 +101,7 @@ import java.nio.file.Path;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
@@ -758,25 +759,28 @@ public class DockerConnector {
     private String buildImage(final DockerConnection dockerConnection,
                               final BuildImageParams params,
                               final ProgressMonitor progressMonitor) throws IOException {
-        final AuthConfigs authConfigs = params.getAuthConfigs();
         final String repository = params.getRepository();
-        final String tag = params.getTag();
 
         try (DockerConnection connection = dockerConnection.method("POST")
                                                            .path(apiVersionPathPrefix + "/build")
-                                                           .query("rm", 1)
-                                                           .query("forcerm", 1)
                                                            .header("X-Registry-Config",
-                                                                   authResolver.getXRegistryConfigHeaderValue(authConfigs))) {
-            if (tag == null) {
-                addQueryParamIfNotNull(connection, "t", repository);
-            } else {
-                addQueryParamIfNotNull(connection, "t", repository == null ? null : repository + ':' + tag);
-            }
+                                                                   authResolver.getXRegistryConfigHeaderValue(params.getAuthConfigs()))) {
+            addQueryParamIfNotNull(connection, "rm", params.isRm());
+            addQueryParamIfNotNull(connection, "forcerm", params.isForceRm());
             addQueryParamIfNotNull(connection, "memory", params.getMemoryLimit());
             addQueryParamIfNotNull(connection, "memswap", params.getMemorySwapLimit());
             addQueryParamIfNotNull(connection, "pull", params.isDoForcePull());
             addQueryParamIfNotNull(connection, "dockerfile", params.getDockerfile());
+            addQueryParamIfNotNull(connection, "nocache", params.isNocache());
+            addQueryParamIfNotNull(connection, "q", params.isQ());
+            if (params.getTag() == null) {
+                addQueryParamIfNotNull(connection, "t", repository);
+            } else {
+                addQueryParamIfNotNull(connection, "t", repository == null ? null : repository + ':' + params.getTag());
+            }
+            if (params.getBuildArgs() != null) {
+                addQueryParamIfNotNull(connection, "buildargs", URLEncoder.encode(GSON.toJson(params.getBuildArgs()), "UTF-8"));
+            }
 
             final DockerResponse response = connection.request();
             if (OK.getStatusCode() != response.getStatus()) {
