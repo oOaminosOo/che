@@ -145,36 +145,26 @@ public class RecipeDaoTest {
         assertTrue(result.contains(recipes.get(0)));
     }
 
-    @Test
+    @Test(dependsOnMethods = "shouldFindRecipeByUser")
     public void shouldFindingRecipesByTags() throws Exception {
-        final List<RecipeImpl> result = recipeDao.search(null, recipes.get(0).getTags(), null, 0, recipes.size());
+        final RecipeImpl recipe = recipes.get(0);
+        final List<RecipeImpl> result = recipeDao.search(recipe.getAcl().get(0).getUser(), recipe.getTags(), null, 0, recipes.size());
 
-        assertTrue(result.contains(recipes.get(0)));
+        assertTrue(result.contains(recipe));
     }
 
-    @Test
+    @Test(dependsOnMethods = "shouldFindRecipeByUser")
     public void shouldFindRecipeByType() throws Exception {
-        final List<RecipeImpl> result = recipeDao.search(null, null, recipes.get(0).getType(), 0, recipes.size());
+        final RecipeImpl recipe = recipes.get(0);
+        final List<RecipeImpl> result = recipeDao.search(recipe.getAcl().get(0).getUser(), null, recipe.getType(), 0, recipes.size());
 
-        assertTrue(result.contains(recipes.get(0)));
+        assertTrue(result.contains(recipe));
     }
 
     @Test(dependsOnMethods = {"shouldFindRecipeByUser", "shouldFindingRecipesByTags", "shouldFindRecipeByType"})
     public void shouldFindRecipeByUserTagsAndType() throws Exception {
         final RecipeImpl recipe = recipes.get(0);
         final List<RecipeImpl> result = recipeDao.search(recipe.getAcl().get(0).getUser(),
-                                                         recipe.getTags(),
-                                                         recipe.getType(),
-                                                         0,
-                                                         1);
-
-        assertTrue(result.contains(recipe));
-    }
-
-    @Test(dependsOnMethods = {"shouldFindRecipeByUser", "shouldFindingRecipesByTags", "shouldFindRecipeByType"})
-    public void shouldFindRecipeByUserTagsAndType1() throws Exception {
-        final RecipeImpl recipe = recipes.get(0);
-        final List<RecipeImpl> result = recipeDao.search("*",
                                                          recipe.getTags(),
                                                          recipe.getType(),
                                                          0,

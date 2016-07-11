@@ -13,7 +13,6 @@ package org.eclipse.che.api.machine.server.recipe;
 import org.eclipse.che.api.core.model.machine.Recipe;
 import org.eclipse.che.api.machine.server.model.impl.AclEntryImpl;
 import org.eclipse.che.api.machine.shared.ManagedRecipe;
-import org.eclipse.che.commons.annotation.Nullable;
 
 import javax.persistence.Basic;
 import javax.persistence.ElementCollection;
@@ -26,6 +25,7 @@ import javax.persistence.NamedQuery;
 import javax.persistence.OneToMany;
 import javax.persistence.PostLoad;
 import javax.persistence.PrePersist;
+import javax.persistence.Transient;
 import javax.persistence.UniqueConstraint;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -45,11 +45,12 @@ import static javax.persistence.CascadeType.ALL;
         {
                 @NamedQuery(
                         name = "Recipe.search",
-                        query = "SELECT DISTINCT rec FROM Recipe rec JOIN rec.acl acl " +
-                                "WHERE ('search' MEMBER OF acl.actions) AND " +
-                                "      (:user IS NULL OR '*' = acl.user OR acl.user = :user) AND " +
-                                "      (:recipeType IS NULL OR rec.type = :recipeType) AND " +
-                                "      (:requiredCount = 0 OR :requiredCount = (SELECT COUNT(tag) " +
+                        query = "SELECT DISTINCT rec FROM Recipe rec " +
+                                "WHERE (EXISTS (SELECT pubAction FROM rec.publicActions pubAction WHERE pubAction = 'search') " +
+                                "   OR (EXISTS (SELECT userAction FROM rec.storedAcl acl, acl.actions userAction " +
+                                "WHERE userAction = 'search' AND acl.user =:user))) " +
+                                "  AND (:recipeType IS NULL OR rec.type = :recipeType) " +
+                                "  AND (:requiredCount = 0 OR :requiredCount = (SELECT COUNT(tag) " +
                                 "                                               FROM Recipe recipe JOIN recipe.tags tag " +
                                 "                                               WHERE tag IN :tags AND rec.id = recipe.id))"
                 )
@@ -75,26 +76,34 @@ public class RecipeImpl implements ManagedRecipe {
     @Basic
     private String description;
 
+    @Transient
+    private List<AclEntryImpl> acl;
+
+    /** list of AclEntry which contain user without wildcard */
     @OneToMany(cascade = ALL, orphanRemoval = true)
     @JoinTable(name = "RECIPE_USER_ACL",
                uniqueConstraints = @UniqueConstraint(columnNames = {"user_id", "recipe_id"}),
                inverseJoinColumns = {@JoinColumn(name = "user_id", referencedColumnName = "user"),
                                      @JoinColumn(name = "acl_id", referencedColumnName = "id")},
                joinColumns = @JoinColumn(name = "recipe_id", referencedColumnName = "id"))
-    private List<AclEntryImpl> acl;
+    private List<AclEntryImpl> storedAcl;
 
     @ElementCollection
     private List<String> tags;
 
+    /** describes the list of actions allowed to any user */
     @ElementCollection
     private List<String> publicActions;
 
     @PrePersist
     private void separateActions() {
+        /** work around for storing public actions in separate collection
+         *  so as not to violate the integrity constraint in case of userId = '*' */
+        storedAcl = new ArrayList<>(getAcl());
         if (publicActions == null) {
             publicActions = new ArrayList<>();
         }
-        final Iterator<AclEntryImpl> aclIterator = acl.iterator();
+        final Iterator<AclEntryImpl> aclIterator = storedAcl.iterator();
         while (aclIterator.hasNext()) {
             final AclEntryImpl aclEntry = aclIterator.next();
             if ("*".equals(aclEntry.getUser())) {
@@ -106,6 +115,7 @@ public class RecipeImpl implements ManagedRecipe {
 
     @PostLoad
     private void collectActions() {
+        acl = new ArrayList<>(storedAcl);
         if (publicActions != null && !publicActions.isEmpty()) {
             acl.add(new AclEntryImpl("*", publicActions));
         }
@@ -260,8 +270,10 @@ public class RecipeImpl implements ManagedRecipe {
         return this;
     }
 
-    @Nullable
     public List<AclEntryImpl> getAcl() {
+        if (acl == null) {
+            return new ArrayList<>();
+        }
         return acl;
     }
 

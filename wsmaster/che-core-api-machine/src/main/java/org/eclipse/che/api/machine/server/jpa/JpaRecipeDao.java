@@ -133,10 +133,9 @@ public class JpaRecipeDao implements RecipeDao {
             tags = tags == null ? Collections.emptyList() : tags;
             final TypedQuery<RecipeImpl> query = manager.createNamedQuery("Recipe.search", RecipeImpl.class)
                                                         .setParameter("user", user)
-                                                        .setParameter("recipeType", type)
                                                         .setParameter("tags", tags)
+                                                        .setParameter("recipeType", type)
                                                         .setParameter("requiredCount", tags.size());
-
             return query.setFirstResult(skipCount)
                         .setMaxResults(maxItems)
                         .getResultList();
