@@ -30,6 +30,7 @@ import org.eclipse.che.ide.api.parts.PartPresenter;
 import org.eclipse.che.ide.api.parts.PartStackUIResources;
 import org.eclipse.che.ide.api.parts.PartStackView;
 import org.eclipse.che.ide.part.widgets.listtab.ListButton;
+import org.eclipse.che.ide.util.loging.Log;
 
 import javax.validation.constraints.NotNull;
 import java.util.HashMap;
@@ -213,6 +214,7 @@ public class EditorPartStackView extends ResizeComposite implements PartStackVie
     /** {@inheritDoc} */
     @Override
     public void selectTab(@NotNull PartPresenter partPresenter) {
+        Log.error(getClass(), "///////////// selectTab " + partPresenter.getTitle());
         IsWidget view = partPresenter.getView();
 
         int viewIndex = contentPanel.getWidgetIndex(view);
