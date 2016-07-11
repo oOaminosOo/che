@@ -23,6 +23,8 @@ import javax.persistence.ElementCollection;
 import javax.persistence.Entity;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
+import javax.persistence.NamedQueries;
+import javax.persistence.NamedQuery;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.persistence.Transient;
@@ -41,6 +43,14 @@ import static org.eclipse.che.api.core.model.workspace.WorkspaceStatus.STOPPED;
  */
 @Entity(name = "Workspace")
 @Table(uniqueConstraints = @UniqueConstraint(columnNames = {"name", "namespace"}))
+@NamedQueries(
+        {
+                @NamedQuery(name = "Workspace.getByNamespace",
+                            query = "SELECT w FROM Workspace w WHERE w.namespace = :namespace"),
+                @NamedQuery(name = "Workspace.getByName",
+                            query = "SELECT w FROM Workspace w WHERE w.namespace = :namespace AND w.name = :name")
+        }
+)
 public class WorkspaceImpl implements Workspace {
 
     public static WorkspaceImplBuilder builder() {
@@ -74,8 +84,8 @@ public class WorkspaceImpl implements Workspace {
 
     public WorkspaceImpl() {}
 
-    public WorkspaceImpl(String id, String namespace, String name, WorkspaceConfig config) {
-        this(id, namespace, name, config, null, null, false, STOPPED);
+    public WorkspaceImpl(String id, String namespace, WorkspaceConfig config) {
+        this(id, namespace, config.getName(), config, null, null, false, STOPPED);
     }
 
     public WorkspaceImpl(String id,
@@ -101,7 +111,7 @@ public class WorkspaceImpl implements Workspace {
     }
 
     public WorkspaceImpl(Workspace workspace) {
-        this(workspace.getId(), workspace.getNamespace(), workspace.getName(), workspace.getConfig());
+        this(workspace.getId(), workspace.getNamespace(), workspace.getConfig());
         this.attributes = new HashMap<>(workspace.getAttributes());
         if (workspace.getRuntime() != null) {
             this.runtime = new WorkspaceRuntimeImpl(workspace.getRuntime());
